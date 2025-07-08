@@ -60,6 +60,7 @@ internal class Program
         // Services
         services.AddSingleton<VLearnApplication>();
         services.AddScoped<IInputService, InputService>();
+        services.AddScoped<IGeminiService, GeminiService>();
         
         // HTTP Client
         services.AddHttpClient();
@@ -72,10 +73,12 @@ internal class Program
 public class VLearnApplication
 {
     private readonly IInputService _inputService;
+    private readonly IGeminiService _geminiService;
 
-    public VLearnApplication(IInputService inputService)
+    public VLearnApplication(IInputService inputService, IGeminiService geminiService)
     {
         _inputService = inputService;
+        _geminiService = geminiService;
     }
 
     public async Task RunAsync(string? filePath = null)
@@ -91,20 +94,33 @@ public class VLearnApplication
             System.Console.WriteLine($"📝 Content length: {input.Content.Length} characters");
             System.Console.WriteLine();
 
-            // TODO: Phase 2 - Gemini integration will go here
-            System.Console.WriteLine("🧠 Generating script with Gemini... (Phase 2 - Not implemented yet)");
+            // Step 2: Generate script with Gemini
+            System.Console.WriteLine("🧠 Generating script with Gemini...");
+            var scriptResponse = await _geminiService.GenerateScriptAsync(input.Content);
             
+            if (!scriptResponse.IsSuccess)
+            {
+                System.Console.WriteLine($"❌ Script generation failed: {scriptResponse.ErrorMessage}");
+                return;
+            }
+
+            var script = scriptResponse.Data!;
+            System.Console.WriteLine($"✅ Script generated successfully!");
+            System.Console.WriteLine($"📝 Script title: {script.Title}");
+            System.Console.WriteLine($"⏱️ Estimated duration: {script.EstimatedDurationSeconds} seconds");
+            System.Console.WriteLine();
+
             // TODO: Phase 3 - Synthesia integration will go here  
             System.Console.WriteLine("🎬 Creating video with Synthesia... (Phase 3 - Not implemented yet)");
             
-            // For now, just show what we received
+            // Show script preview
             System.Console.WriteLine();
-            System.Console.WriteLine("📋 Input Preview:");
-            System.Console.WriteLine("-".PadRight(30, '-'));
-            System.Console.WriteLine(input.Content.Length > 200 
-                ? input.Content[..200] + "..." 
-                : input.Content);
-            System.Console.WriteLine("-".PadRight(30, '-'));
+            System.Console.WriteLine("📋 Generated Script Preview:");
+            System.Console.WriteLine("=".PadRight(50, '='));
+            System.Console.WriteLine(script.Content.Length > 300 
+                ? script.Content[..300] + "..." 
+                : script.Content);
+            System.Console.WriteLine("=".PadRight(50, '='));
         }
         catch (Exception ex)
         {

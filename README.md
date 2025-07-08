@@ -57,7 +57,7 @@ Then enter your text content and press Enter twice to finish.
 ## 🔄 How It Works
 
 1. **📖 Input Processing** - Reads text from file or console input
-2. **🧠 Script Generation** - Converts text to learning script using Google Gemini API *(Phase 2 - In Development)*
+2. **🧠 Script Generation** - Converts text to learning script using Google Gemini API *(Phase 2 - COMPLETED)*
 3. **🎬 Video Creation** - Generates video using Synthesia API with default settings *(Phase 3 - In Development)*
 4. **💾 Output** - Downloads MP4 video to local `output/` folder
 
@@ -82,7 +82,8 @@ VLearn/
 │   │   ├── VideoRequest.cs     # Video request model
 │   │   └── ApiModels.cs        # API response models
 │   ├── Services/               # Application services
-│   │   └── InputService.cs     # Input processing service
+│   │   ├── InputService.cs     # Input processing service
+│   │   └── GeminiService.cs    # Gemini API integration
 │   └── Configuration/          # Configuration models
 │       └── AppSettings.cs      # Settings classes
 ├── PROJECT_PLAN_V2.md          # Detailed project plan
@@ -105,17 +106,17 @@ VLearn/
 - [x] Basic configuration system
 - [x] Core data models
 
-### 🔄 Phase 2: Google Gemini Integration (IN PROGRESS)
-- [ ] Gemini API client implementation
-- [ ] Script generation from text input
-- [ ] Prompt template for educational content
+### ✅ Phase 2: Google Gemini Integration (COMPLETED)
+- [x] Gemini API client implementation
+- [x] Script generation from text input
+- [x] Prompt template for educational content
 
-### 📋 Phase 3: Synthesia Integration (PLANNED)
+### � Phase 3: Synthesia Integration (IN DEVELOPMENT)
 - [ ] Synthesia API client
 - [ ] Video creation with default parameters
 - [ ] Video status polling and download
 
-### 🎯 Phase 4: End-to-End Testing (PLANNED)
+### 📋 Phase 4: End-to-End Testing (PLANNED)
 - [ ] Complete pipeline integration
 - [ ] Error handling and user feedback
 - [ ] Documentation completion
@@ -174,15 +175,18 @@ dotnet run -- generate sample-input.txt
 ✅ Input received from: sample-input.txt
 📝 Content length: 673 characters
 
-🧠 Generating script with Gemini... (Phase 2 - Not implemented yet)
+🧠 Generating script with Gemini...
+🔗 Calling Gemini API...
+✅ Script generated successfully!
+📝 Script title: Learning Video Script
+⏱️ Estimated duration: 128 seconds
 🎬 Creating video with Synthesia... (Phase 3 - Not implemented yet)
 
-📋 Input Preview:
-------------------------------
-Artificial Intelligence and Machine Learning
-AI and ML are transformative technologies that are reshaping how we solve comple
-x problems. Machine learning allows computers to learn patterns from dat...
-------------------------------
+📋 Generated Script Preview:
+==================================================
+Hey everyone, and welcome! Today we're diving into the exciting world of Artific
+ial Intelligence and Machine Learning – or AI and ML, as they're often called...
+==================================================
 ✅ Process completed successfully!
 ```
 
@@ -197,5 +201,5 @@ This project is for educational and demonstration purposes.
 ---
 
 **🎯 Goal**: Simple text-to-video conversion with minimal complexity  
-**⚡ Status**: Phase 1 Complete, Phase 2 In Development  
+**⚡ Status**: Phase 1 & 2 Complete, Phase 3 In Development  
 **📅 Last Updated**: July 8, 2025
