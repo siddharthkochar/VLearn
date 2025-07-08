@@ -20,6 +20,35 @@ public class VideoResponse
     public string Status { get; set; } = string.Empty;
     public string? DownloadUrl { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? Title { get; set; }
+    public int? Duration { get; set; }
+}
+
+/// <summary>
+/// Represents Synthesia video creation request
+/// </summary>
+public class SynthesiaVideoRequest
+{
+    public bool Test { get; set; } = true;
+    public string Title { get; set; } = string.Empty;
+    public List<SynthesiaInput> Input { get; set; } = new();
+}
+
+public class SynthesiaInput
+{
+    public SynthesiaAvatar Avatar { get; set; } = new();
+    public SynthesiaBackground Background { get; set; } = new();
+    public string ScriptText { get; set; } = string.Empty;
+}
+
+public class SynthesiaAvatar
+{
+    public string Avatar { get; set; } = "anna_costume1_cameraA";
+}
+
+public class SynthesiaBackground
+{
+    public string Background { get; set; } = "green_screen";
 }
 
 /// <summary>

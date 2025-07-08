@@ -61,6 +61,8 @@ internal class Program
         services.AddSingleton<VLearnApplication>();
         services.AddScoped<IInputService, InputService>();
         services.AddScoped<IGeminiService, GeminiService>();
+        services.AddScoped<ISynthesiaService, SynthesiaService>();
+        services.AddScoped<IVideoProcessingService, VideoProcessingService>();
         
         // HTTP Client
         services.AddHttpClient();
@@ -74,11 +76,13 @@ public class VLearnApplication
 {
     private readonly IInputService _inputService;
     private readonly IGeminiService _geminiService;
+    private readonly IVideoProcessingService _videoProcessingService;
 
-    public VLearnApplication(IInputService inputService, IGeminiService geminiService)
+    public VLearnApplication(IInputService inputService, IGeminiService geminiService, IVideoProcessingService videoProcessingService)
     {
         _inputService = inputService;
         _geminiService = geminiService;
+        _videoProcessingService = videoProcessingService;
     }
 
     public async Task RunAsync(string? filePath = null)
@@ -110,11 +114,20 @@ public class VLearnApplication
             System.Console.WriteLine($"⏱️ Estimated duration: {script.EstimatedDurationSeconds} seconds");
             System.Console.WriteLine();
 
-            // TODO: Phase 3 - Synthesia integration will go here  
-            System.Console.WriteLine("🎬 Creating video with Synthesia... (Phase 3 - Not implemented yet)");
+            // Step 3: Create video with Synthesia
+            System.Console.WriteLine("� Creating video with Synthesia...");
+            var videoResult = await _videoProcessingService.ProcessVideoAsync(script);
             
-            // Show script preview
+            if (!videoResult.IsSuccess)
+            {
+                System.Console.WriteLine($"❌ Video creation failed: {videoResult.ErrorMessage}");
+                return;
+            }
+
+            System.Console.WriteLine($"🎉 Video ready: {videoResult.Data}");
             System.Console.WriteLine();
+            
+            // Show script preview for reference
             System.Console.WriteLine("📋 Generated Script Preview:");
             System.Console.WriteLine("=".PadRight(50, '='));
             System.Console.WriteLine(script.Content.Length > 300 

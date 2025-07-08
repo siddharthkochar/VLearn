@@ -61,27 +61,51 @@
 ### 🎥 Phase 3: Synthesia Integration (3-4 days)
 
 #### 🎭 Synthesia API Setup
-- [ ] **🔌 Synthesia API client** *(1 day)*
-  - [ ] 🔐 API key configuration and authentication
-  - [ ] 🌐 HTTP client for video creation
-  - [ ] 📊 Basic status checking functionality
+- [x] **🔌 Synthesia API client** *(1 day)* ✅
+  - [x] 🔐 API key configuration and authentication
+  - [x] 🌐 HTTP client for video creation
+  - [x] 📊 Basic status checking functionality
 
 #### 🎬 Video Generation
-- [ ] **🔄 Script to video conversion** *(2 days)*
-  - [ ] 🗺️ Map script text to Synthesia video request
-  - [ ] 🎭 Use default avatar (anna_costume1_cameraA)
-  - [ ] 🎨 Use default background (green_screen)
-  - [ ] ⏱️ Implement polling for video completion
+- [x] **🔄 Script to video conversion** *(2 days)* ✅
+  - [x] 🗺️ Map script text to Synthesia video request
+  - [x] 🎭 Use default avatar (anna_costume1_cameraA)
+  - [x] 🎨 Use default background (green_screen)
+  - [x] ⏱️ Implement polling for video completion
 
 #### 💾 Video Download
-- [ ] **📥 Download completed video** *(1 day)*
-  - [ ] 🔄 Poll video status until complete
-  - [ ] 📁 Download MP4 file to local directory
-  - [ ] 📝 Simple file naming convention
+- [x] **📥 Download completed video** *(1 day)* ✅
+  - [x] 🔄 Poll video status until complete
+  - [x] 📁 Download MP4 file to local directory
+  - [x] 📝 Simple file naming convention
 
 ---
 
-### 🎯 Phase 4: End-to-End Integration & Testing (2-3 days)
+### 🤖 Phase 4: DeepBrainAI Integration (3-4 days)
+
+#### � DeepBrainAI API Setup
+- [ ] **🔌 DeepBrainAI API client** *(1 day)*
+  - [ ] 🔐 API key configuration and authentication
+  - [ ] 🌐 HTTP client for AI Studios video creation
+  - [ ] 📊 Basic status checking functionality
+
+#### 🎬 AI Video Generation
+- [ ] **🔄 Script to AI video conversion** *(2 days)*
+  - [ ] 🗺️ Map script text to DeepBrainAI video request
+  - [ ] 🎭 Use default AI model (ysy or similar)
+  - [ ] 👔 Use default clothes configuration
+  - [ ] 🌍 Configure language settings (en for English)
+  - [ ] ⏱️ Implement polling for video completion
+
+#### 💾 AI Video Download
+- [ ] **📥 Download completed AI video** *(1 day)*
+  - [ ] 🔄 Poll video status using project key
+  - [ ] 📁 Download MP4 file to local directory
+  - [ ] 📝 Enhanced file naming convention with provider prefix
+
+---
+
+### �🎯 Phase 5: End-to-End Integration & Testing (2-3 days)
 
 #### 🔗 Complete Pipeline
 - [ ] **⚡ Integrate all components** *(1 day)*
@@ -116,21 +140,22 @@ vlearn generate input.txt
 # Console will show:
 # 1. "Processing input..."
 # 2. "Generating script with Gemini..."
-# 3. "Creating video with Synthesia..."
-# 4. "Video ready: output/video_timestamp.mp4"
+# 3. "Creating video with DeepBrainAI..." (primary provider)
+# 4. "Video ready: output/deepbrain_video_timestamp.mp4"
 ```
 
 ### 🔄 **Processing Flow**
 1. **📖 Input Processing** - Read text from console or file
 2. **🧠 Script Generation** - Send to Gemini API for script creation
-3. **🎬 Video Creation** - Send script to Synthesia API
+3. **🎬 Video Creation** - Send script to DeepBrainAI API (primary) with Synthesia as backup
 4. **⏰ Status Polling** - Wait for video completion (3-5 minutes)
 5. **💾 Download** - Save MP4 to local output folder
 
 ### 📁 **Output Structure**
 ```
 output/
-├── video_20250708_143022.mp4    # Generated video file
+├── deepbrain_video_20250708_143022.mp4    # DeepBrainAI generated video
+├── synthesia_video_20250708_143025.mp4    # Synthesia generated video (if used)
 ```
 
 ---
@@ -141,7 +166,7 @@ output/
 - **🏗️ Framework:** .NET 8 Console Application
 - **📦 Dependencies:** Minimal - only HTTP client and JSON serialization
 - **🤖 AI Integration:** Google Gemini API (REST API calls)
-- **🎥 Video Generation:** Synthesia API (REST API calls)
+- **🎥 Video Generation:** DeepBrainAI API (primary) + Synthesia API (backup)
 
 ### 📋 Required NuGet Packages
 - `System.Text.Json` - JSON serialization
@@ -169,16 +194,18 @@ output/
 - **🎭 Output Format:** Plain text script suitable for video narration
 - **🚫 No Customization:** Single prompt template, no user modifications
 
-### 🎥 Video Generation (Synthesia)
-- **👤 Avatar:** Fixed - `anna_costume1_cameraA`
-- **🎨 Background:** Fixed - `green_screen`
-- **🗣️ Voice:** Default Synthesia voice for selected avatar
+### 🎥 Video Generation (DeepBrainAI Primary + Synthesia Backup)
+- **👤 AI Model:** Fixed - `ysy` or default DeepBrainAI model
+- **👔 Clothes:** Fixed - default clothes configuration (`"1"`)
+- **🌍 Language:** Automatic based on script content (`"en"` for English)
+- **🗣️ Voice:** Default DeepBrainAI voice for selected model
 - **⏱️ Duration:** Based on script length (automatic)
-- **🚫 No Customization:** No avatar selection, background options, or voice changes
+- **🔄 Fallback:** Synthesia API if DeepBrainAI fails
+- **🚫 No Customization:** No model selection, clothes options, or voice changes
 
 ### 💾 Output Management
 - **📁 Location:** `output/` folder in application directory
-- **📝 Naming:** `video_YYYYMMDD_HHMMSS.mp4`
+- **📝 Naming:** `deepbrain_video_YYYYMMDD_HHMMSS.mp4` (primary) or `synthesia_video_YYYYMMDD_HHMMSS.mp4` (backup)
 - **🔄 Overwrite:** New timestamp for each video (no overwrites)
 - **🚫 No Features:** No metadata files, no intermediate file saving
 
@@ -196,6 +223,10 @@ output/
   "SynthesiaApi": {
     "ApiKey": "your-synthesia-api-key",
     "BaseUrl": "https://api.synthesia.io"
+  },
+  "DeepBrainApi": {
+    "ApiKey": "your-deepbrain-api-key",
+    "BaseUrl": "https://v2.aistudios.com/api/odin"
   }
 }
 ```
@@ -203,6 +234,7 @@ output/
 ### 🌍 Environment Variables (Alternative)
 - `GEMINI_API_KEY`
 - `SYNTHESIA_API_KEY`
+- `DEEPBRAIN_API_KEY`
 
 ---
 
@@ -269,6 +301,13 @@ output/
 - [ ] ⏰ Implement status polling mechanism
 - [ ] 💾 Implement video download functionality
 
+### 🤖 DeepBrainAI Integration
+- [ ] 🌐 Implement HTTP client for DeepBrainAI API
+- [ ] 🔄 Create video request with default AI model and clothes
+- [ ] 🌍 Configure language detection and settings
+- [ ] ⏰ Implement status polling using project key
+- [ ] 💾 Implement video download functionality
+
 ### 🔗 Integration & Testing
 - [ ] ⚡ Connect all components in main application flow
 - [ ] 🧪 Test complete pipeline with various inputs
@@ -298,7 +337,12 @@ output/
 - [ ] 🎥 Synthesia API integration complete
 - [ ] 💾 Can download generated videos
 
-### 🏁 Day 8 Goals
+### 🏁 Day 9 Goals
+- [ ] 🤖 DeepBrainAI API integration complete
+- [ ] 🎬 Can generate videos with AI models
+- [ ] 🔄 Dual provider system working
+
+### 🏁 Day 11 Goals
 - [ ] 🔗 Complete end-to-end pipeline working
 - [ ] 📚 Basic usage documentation ready
 
