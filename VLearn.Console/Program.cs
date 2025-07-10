@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VLearn.Console.Configuration;
 using VLearn.Console.Services;
@@ -62,7 +62,9 @@ internal class Program
         services.AddScoped<IInputService, InputService>();
         services.AddScoped<IGeminiService, GeminiService>();
         services.AddScoped<ISynthesiaService, SynthesiaService>();
+        services.AddScoped<IDeepBrainService, DeepBrainService>();
         services.AddScoped<IVideoProcessingService, VideoProcessingService>();
+        services.AddScoped<IDualVideoProcessingService, DualVideoProcessingService>();
         
         // HTTP Client
         services.AddHttpClient();
@@ -76,13 +78,13 @@ public class VLearnApplication
 {
     private readonly IInputService _inputService;
     private readonly IGeminiService _geminiService;
-    private readonly IVideoProcessingService _videoProcessingService;
+    private readonly IDualVideoProcessingService _dualVideoProcessingService;
 
-    public VLearnApplication(IInputService inputService, IGeminiService geminiService, IVideoProcessingService videoProcessingService)
+    public VLearnApplication(IInputService inputService, IGeminiService geminiService, IDualVideoProcessingService dualVideoProcessingService)
     {
         _inputService = inputService;
         _geminiService = geminiService;
-        _videoProcessingService = videoProcessingService;
+        _dualVideoProcessingService = dualVideoProcessingService;
     }
 
     public async Task RunAsync(string? filePath = null)
@@ -114,9 +116,9 @@ public class VLearnApplication
             System.Console.WriteLine($"⏱️ Estimated duration: {script.EstimatedDurationSeconds} seconds");
             System.Console.WriteLine();
 
-            // Step 3: Create video with Synthesia
-            System.Console.WriteLine("� Creating video with Synthesia...");
-            var videoResult = await _videoProcessingService.ProcessVideoAsync(script);
+            // Step 3: Create video with dual provider support (DeepBrainAI primary, Synthesia fallback)
+            System.Console.WriteLine("🎥 Creating video with AI providers...");
+            var videoResult = await _dualVideoProcessingService.ProcessVideoAsync(script, VideoProvider.DeepBrainAI);
             
             if (!videoResult.IsSuccess)
             {

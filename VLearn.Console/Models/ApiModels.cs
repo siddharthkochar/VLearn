@@ -52,6 +52,38 @@ public class SynthesiaBackground
 }
 
 /// <summary>
+/// Represents DeepBrainAI video creation request
+/// </summary>
+public class DeepBrainVideoRequest
+{
+    public string Language { get; set; } = "en";
+    public string Text { get; set; } = string.Empty;
+    public string Model { get; set; } = "ysy";
+    public string Clothes { get; set; } = "1";
+    public string? Webhook { get; set; }
+}
+
+/// <summary>
+/// Represents DeepBrainAI video creation response
+/// </summary>
+public class DeepBrainVideoResponse
+{
+    public bool Success { get; set; }
+    public string Key { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Represents DeepBrainAI project status response
+/// </summary>
+public class DeepBrainProjectResponse
+{
+    public string Status { get; set; } = string.Empty;
+    public string? DownloadUrl { get; set; }
+    public string? Title { get; set; }
+    public DateTime? CreatedAt { get; set; }
+}
+
+/// <summary>
 /// Represents Gemini API response
 /// </summary>
 public class GeminiResponse
