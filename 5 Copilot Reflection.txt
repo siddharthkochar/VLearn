@@ -1,0 +1,20 @@
+🎬 VLearn V2 - Why Copilot suggestion is agreed or accepted
+===============================================================
+
+Instead of providing details and directly asking to implement the requirement, I've spend significant time with Claude Sonnet 4 to plan this project. This planning mode which includes following things:
+
+Plan Feature Delivery:
+- Sharing the detailed requirements
+- Setting up the context of this activity
+- Prioritize the core requirements over advanced features
+- Getting LLMs recommendations which fit the needs of this activity
+
+Development Process:
+- Create a trackable step by step plan for the development
+- Plan for task with small steps
+- Setup actions to verify the code for any implementation/logical errors
+- Actions to test the code with sample inputs
+- Manual review of code
+- Detailed Commit and push after each Phase of development.
+
+GitHub Copilot suggestions were accepted because they are technically sound. Although I have to ask to keep things simple for POC while the suggestions were for Enterprise level software. The combination of AI assistance and human judgment resulted in a higher quality product delivered in less time than traditional development approaches.

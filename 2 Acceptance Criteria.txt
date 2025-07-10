@@ -1,0 +1,9 @@
+🎬 VLearn V2 - ACCEPTANCE CRITERIA
+==============================
+✅ Application accepts text input via file or console
+✅ Successfully generates educational scripts using Gemini API
+✅ Creates videos using dual provider system (DeepBrainAI primary)
+✅ Automatically falls back to Synthesia when primary fails
+✅ Downloads and saves videos with proper naming conventions
+✅ Completes end-to-end process within time limits
+✅ Provides clear status updates throughout processing

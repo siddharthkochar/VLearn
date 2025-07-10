@@ -1,0 +1,45 @@
+🎬 VLearn V2 - Detailed Requirements
+=====================================
+
+CORE REQUIREMENTS
+A proof-of-concent to create a solution which accepts text as input, transform text into scripts using Google Gemini and use text to video platforms like Synthesia or DeepBrainAI to create a learning content. The goal is to make use of LLM with AI tools to make development faster, code with quality, write top notch documentation with all the details. Another object is to understand strenght and weakness of different LLMs which can be utilized in different ways. 
+
+
+Application Requirements
+-------------------------------
+• Console Application Architecture
+  - .NET 8 console application with dependency injection
+  - Minimal external dependencies (HTTP client, JSON serialization)
+  - Configuration management via appsettings.json and environment variables
+  - Single-command interface for ease of use
+
+• Input Processing System
+  - File input mode: Accept text file path as command line argument
+  - Interactive mode: Accept direct text input from console
+  - Text validation: Ensure non-empty input content
+  - Support for various text encodings (UTF-8 primary)
+  - Maximum text length limits based on API provider constraints
+
+AI Script Generation Integration
+------------------------------------
+• Google Gemini API Integration
+  - REST API client implementation with proper authentication
+  - Educational content prompt template optimization
+  - Script generation from raw text input
+  - Response parsing and validation
+  - Error handling for API failures and rate limits
+
+• Content Transformation
+  - Convert unstructured text into structured learning scripts
+  - Generate engaging educational narratives
+  - Maintain content accuracy and relevance
+  - Produce scripts suitable for video narration
+  - Estimate video duration based on script length
+
+Video Generator Integrations
+-------------------------
+• Synthesia / DeepBrainAI
+  - Consistent request/response patterns
+  - Standardized error handling
+  - Unified status polling mechanism
+  - Common download protocols
