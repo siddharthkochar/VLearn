@@ -1,0 +1,12 @@
+Machine Learning Fundamentals
+
+Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed for every scenario.
+
+Key Concepts:
+1. Supervised Learning - Learning from labeled examples
+2. Unsupervised Learning - Finding patterns in unlabeled data  
+3. Reinforcement Learning - Learning through trial and error
+
+Popular algorithms include linear regression, decision trees, neural networks, and support vector machines. These algorithms power applications like recommendation systems, fraud detection, medical diagnosis, and predictive analytics.
+
+The machine learning process typically involves data collection, preprocessing, model training, evaluation, and deployment. Success depends on having quality data, choosing appropriate algorithms, and proper validation techniques.
