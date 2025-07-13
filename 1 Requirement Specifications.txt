@@ -38,7 +38,7 @@ AI Script Generation Integration
 
 Video Generator Integrations
 -------------------------
-• Synthesia / DeepBrainAI
+• HeyGen AI
   - Consistent request/response patterns
   - Standardized error handling
   - Unified status polling mechanism

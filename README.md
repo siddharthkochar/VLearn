@@ -1,20 +1,19 @@
 # 🎬 VLearn V2 - AI Video Learning Console App
 
-A minimal console application that converts text input into learning videos using Google Gemini API for script generation and dual video providers (DeepBrainAI primary, Synthesia fallback) for video creation.
+A minimal console application that converts text input into learning videos using Google Gemini API for script generation and HeyGen API for AI avatar video creation.
 
 ## 🎯 Overview
 
 VLearn V2 is a simplified proof-of-concept application that demonstrates an automated pipeline for creating educational videos from text content. The application follows a bare minimum approach with no customizations, no logging, and uses default values for all video generation parameters.
 
-The system supports **dual video providers** with DeepBrainAI as the primary provider and Synthesia as the fallback provider, ensuring high availability and redundancy.
+The system uses **HeyGen's AI avatar technology** to create professional-quality educational videos with realistic AI presenters.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - .NET 8 Runtime
 - Google Gemini API key
-- Synthesia API key
-- DeepBrainAI API key (for Phase 4 - optional)
+- HeyGen API key
 
 ### Installation
 
@@ -31,13 +30,9 @@ cd VLearn
     "ApiKey": "your-gemini-api-key",
     "BaseUrl": "https://generativelanguage.googleapis.com/v1beta"
   },
-  "SynthesiaApi": {
-    "ApiKey": "your-synthesia-api-key",
-    "BaseUrl": "https://api.synthesia.io/v2"
-  },
-  "DeepBrainApi": {
-    "ApiKey": "your-deepbrain-api-key",
-    "BaseUrl": "https://v2.aistudios.com/api/odin"
+  "HeyGenApi": {
+    "ApiKey": "your-heygen-api-key",
+    "BaseUrl": "https://api.heygen.com"
   }
 }
 ```
@@ -64,29 +59,22 @@ Then enter your text content and press Enter twice to finish.
 ## 🔄 How It Works
 
 1. **📖 Input Processing** - Reads text from file or console input
-2. **🧠 Script Generation** - Converts text to learning script using Google Gemini API *(Phase 2 - COMPLETED)*
-3. **🤖 Primary Video Creation** - Generates video using DeepBrainAI API with default AI model *(Phase 4 - COMPLETED)*
-4. **🔄 Fallback Processing** - If DeepBrainAI fails, automatically switches to Synthesia API *(Phase 3 - COMPLETED)*
-5. **💾 Output** - Downloads MP4 video to local `output/` folder with provider-specific naming
+2. **🧠 Script Generation** - Converts text to learning script using Google Gemini API
+3. **🤖 Video Creation** - Generates video using HeyGen's AI avatar technology
+4. **💾 Output** - Downloads MP4 video to local `output/` folder with timestamped naming
 
 ## 🎛️ Default Settings
 
-### DeepBrainAI (Primary Provider)
-- **AI Model**: `ysy` (default AI model)
-- **Clothes**: Default configuration (`"1"`)
-- **Language**: Auto-detected (`"en"` for English)
-- **Voice**: Default DeepBrainAI voice for selected model
-
-### Synthesia (Fallback Provider)
-- **Avatar**: `anna_costume1_cameraA`
-- **Background**: `green_screen`
-- **Voice**: Default Synthesia voice for selected avatar
+### HeyGen AI Avatar
+- **Avatar**: `Abigail_expressive_2024112501` (professional AI presenter)
+- **Voice**: `73c0b6a2e29d4d38aca41454bf58c955` (clear English voice)
+- **Speed**: 1.1x playback speed for optimal pacing
+- **Dimensions**: 1280x720 (HD quality)
 
 ### Output Settings
 - **Output Format**: MP4 video file
-- **Primary Output**: `output/deepbrain_video_YYYYMMDD_HHMMSS_title.mp4`
-- **Fallback Output**: `output/synthesia_video_YYYYMMDD_HHMMSS_title.mp4`
-- **Processing Time**: 3-5 minutes typical (varies by provider and content length)
+- **File Naming**: `heygen_video_YYYYMMDD_HHMMSS_ScriptTitle.mp4`
+- **Processing Time**: 3-5 minutes typical (varies by content length)
 
 ## 📁 Project Structure
 
@@ -103,10 +91,8 @@ VLearn/
 │   ├── Services/               # Application services
 │   │   ├── InputService.cs     # Input processing service
 │   │   ├── GeminiService.cs    # Gemini API integration
-│   │   ├── SynthesiaService.cs # Synthesia API integration
-│   │   ├── DeepBrainService.cs # DeepBrainAI API integration
-│   │   ├── VideoProcessingService.cs # Original Synthesia workflow
-│   │   └── DualVideoProcessingService.cs # Dual provider management
+│   │   ├── HeyGenService.cs    # HeyGen API integration
+│   │   └── VideoProcessingService.cs # Video workflow management
 │   └── Configuration/          # Configuration models
 │       └── AppSettings.cs      # Settings classes for all APIs
 ├── PROJECT_PLAN.md             # Detailed project plan with all phases
@@ -117,8 +103,8 @@ VLearn/
 
 - **Framework**: .NET 8 Console Application
 - **AI Integration**: Google Gemini API (REST)
-- **Video Generation**: DeepBrainAI API (primary), Synthesia API (fallback)
-- **Architecture**: Dual provider system with automatic failover
+- **Video Generation**: HeyGen API for AI avatar videos
+- **Architecture**: Single provider system with robust error handling
 - **Dependencies**: Minimal - HTTP client, JSON serialization, configuration management
 
 ## 📊 Development Status
@@ -135,23 +121,16 @@ VLearn/
 - [x] Prompt template for educational content
 - [x] Intelligent script parsing and validation
 
-### ✅ Phase 3: Synthesia Integration (COMPLETED)
-- [x] Synthesia API client with authentication
-- [x] Video creation with default parameters
+### ✅ Phase 3: HeyGen Integration (COMPLETED)
+- [x] HeyGen API client with authentication
+- [x] AI avatar video creation with default parameters
 - [x] Smart video status polling and download
 - [x] End-to-end video processing workflow
 
-### ✅ Phase 4: DeepBrainAI Integration (COMPLETED)
-- [x] DeepBrainAI API client implementation
-- [x] AI model integration with default settings
-- [x] Dual provider support system
-- [x] Enhanced file naming with provider prefixes
-- [x] Automatic failover mechanism
-
-### ✅ Phase 5: End-to-End Testing & Documentation (COMPLETED)
+### ✅ Phase 4: End-to-End Testing & Documentation (COMPLETED)
 - [x] Complete pipeline integration testing
 - [x] Build verification and configuration validation
-- [x] Dual provider workflow testing
+- [x] HeyGen video generation workflow testing
 - [x] Comprehensive usage documentation
 
 ## 🚫 Limitations
@@ -171,17 +150,11 @@ By design, this application:
 2. Create a new API key
 3. Add it to your `appsettings.json` or set `GEMINI_API_KEY` environment variable
 
-### DeepBrainAI API (Required for Primary Provider)
-1. Sign up at [DeepBrain AI Studios](https://www.aistudios.com/)
+### HeyGen API (Required)
+1. Sign up at [HeyGen](https://app.heygen.com/)
 2. Navigate to API settings in your dashboard
 3. Generate a new API key
-4. Add it to your `appsettings.json` or set `DEEPBRAIN_API_KEY` environment variable
-
-### Synthesia API (Required for Fallback Provider)
-1. Sign up at [Synthesia](https://www.synthesia.io/)
-2. Go to Account → Integrations
-3. Create a new API key
-4. Add it to your `appsettings.json` or set `SYNTHESIA_API_KEY` environment variable
+4. Add it to your `appsettings.json` or set `HEYGEN_API_KEY` environment variable
 
 ## 📝 Example Usage
 
@@ -220,20 +193,19 @@ dotnet run -- generate sample-input.txt
 📝 Script title: Learning Video Script
 ⏱️ Estimated duration: 128 seconds
 
-🎥 Creating video with AI providers...
-🎬 Attempting video creation with DeepBrainAI...
-🤖 Submitting DeepBrainAI video creation request...
-✅ DeepBrainAI video creation started. Project Key: abc123
+🎥 Creating video with HeyGen...
+🤖 Submitting HeyGen video creation request...
+✅ HeyGen video creation started. Video ID: abc123
 ⏰ Video is being processed. This typically takes 3-5 minutes...
-🔄 Checking DeepBrainAI project status... (Attempt 1/60)
-📊 Project status: in_progress
-🔄 Checking DeepBrainAI project status... (Attempt 2/60)
-📊 Project status: complete
-✅ DeepBrainAI video processing completed!
-💾 Downloading DeepBrainAI video...
-💾 DeepBrainAI video saved: output/deepbrain_video_20250710_143022_Learning_Video_Script.mp4
+🔄 Checking HeyGen video status... (Attempt 1/60)
+📊 Video status: processing
+🔄 Checking HeyGen video status... (Attempt 2/60)
+📊 Video status: complete
+✅ HeyGen video processing completed!
+💾 Downloading HeyGen video...
+💾 HeyGen video saved: output/heygen_video_20250713_143022_Learning_Video_Script.mp4
 📏 File size: 15.23 MB
-🎉 Video ready: output/deepbrain_video_20250710_143022_Learning_Video_Script.mp4
+🎉 Video ready: output/heygen_video_20250713_143022_Learning_Video_Script.mp4
 
 📋 Generated Script Preview:
 ==================================================
@@ -243,29 +215,6 @@ ial Intelligence and Machine Learning – or AI and ML, as they're often called.
 ✅ Process completed successfully!
 ```
 
-## 🔄 Dual Provider System
-
-VLearn V2 features an intelligent dual provider system that ensures high availability:
-
-### Provider Priority
-1. **Primary**: DeepBrainAI API (faster processing, AI-powered avatars)
-2. **Fallback**: Synthesia API (reliable backup, traditional avatars)
-
-### Automatic Failover
-- If DeepBrainAI fails or times out, automatically switches to Synthesia
-- Preserves all processing and continues seamlessly
-- Different file naming to identify which provider was used
-
-### Provider-Specific Features
-- **DeepBrainAI**: AI model `ysy`, clothes config `"1"`, language auto-detection
-- **Synthesia**: Avatar `anna_costume1_cameraA`, `green_screen` background
-
-### Troubleshooting
-- **Both providers fail**: Check API keys and network connectivity
-- **DeepBrainAI only fails**: Will automatically use Synthesia (normal operation)
-- **Long processing times**: Both providers typically take 3-5 minutes
-- **Configuration errors**: Verify `appsettings.json` is in output directory
-
 ## 🤝 Contributing
 
 This is a proof-of-concept project with a specific minimal scope. Please refer to `PROJECT_PLAN.md` for detailed development guidelines and current status.
@@ -273,13 +222,12 @@ This is a proof-of-concept project with a specific minimal scope. Please refer t
 **Project Status**: All major phases completed! ✅
 - ✅ Phase 1: Console Application Setup
 - ✅ Phase 2: Google Gemini Integration  
-- ✅ Phase 3: Synthesia Integration
-- ✅ Phase 4: DeepBrainAI Integration
-- ✅ Phase 5: Testing & Documentation
+- ✅ Phase 3: HeyGen Integration
+- ✅ Phase 4: Testing & Documentation
 
 Future enhancements could include:
 - Additional video providers
-- Custom avatar/model selection
+- Custom avatar/voice selection
 - Batch processing capabilities
 - Advanced error recovery and retry logic
 
@@ -289,6 +237,6 @@ This project is for educational and demonstration purposes.
 
 ---
 
-**🎯 Goal**: Simple text-to-video conversion with dual provider reliability  
+**🎯 Goal**: Simple text-to-video conversion with HeyGen AI avatars  
 **⚡ Status**: All Phases Complete - Production Ready ✅  
-**📅 Last Updated**: July 10, 2025
+**📅 Last Updated**: July 13, 2025
