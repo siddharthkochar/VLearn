@@ -33,12 +33,12 @@ public class HeyGenService : IHeyGenService
         {
             if (string.IsNullOrEmpty(_settings.ApiKey))
             {
-                return new ApiResponse<HeyGenVideoResponse>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "HeyGen API key is not configured. Please add your API key to appsettings.json",
-                    StatusCode = 400
-                };
+                return new ApiResponse<HeyGenVideoResponse>(
+                    IsSuccess: false,
+                    Data: null,
+                    ErrorMessage: "HeyGen API key is not configured. Please add your API key to appsettings.json",
+                    StatusCode: 400
+                );
             }
 
             var videoRequest = CreateVideoRequest(script);
@@ -58,41 +58,41 @@ public class HeyGenService : IHeyGenService
 
             if (!response.IsSuccessStatusCode)
             {
-                return new ApiResponse<HeyGenVideoResponse>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"HeyGen API error: {response.StatusCode} - {responseJson}",
-                    StatusCode = (int)response.StatusCode
-                };
+                return new ApiResponse<HeyGenVideoResponse>(
+                    IsSuccess: false,
+                    Data: null,
+                    ErrorMessage: $"HeyGen API error: {response.StatusCode} - {responseJson}",
+                    StatusCode: (int)response.StatusCode
+                );
             }
 
             var videoResponse = JsonSerializer.Deserialize<HeyGenVideoResponse>(responseJson);
 
             if (videoResponse == null || videoResponse.Code != 100)
             {
-                return new ApiResponse<HeyGenVideoResponse>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"HeyGen API returned error: {videoResponse?.Message ?? "Unknown error"}",
-                    StatusCode = 500
-                };
+                return new ApiResponse<HeyGenVideoResponse>(
+                    IsSuccess: false,
+                    Data: null,
+                    ErrorMessage: $"HeyGen API returned error: {videoResponse?.Message ?? "Unknown error"}",
+                    StatusCode: 500
+                );
             }
 
-            return new ApiResponse<HeyGenVideoResponse>
-            {
-                IsSuccess = true,
-                Data = videoResponse,
-                StatusCode = 200
-            };
+            return new ApiResponse<HeyGenVideoResponse>(
+                IsSuccess: true,
+                Data: videoResponse,
+                ErrorMessage: string.Empty,
+                StatusCode: 200
+            );
         }
         catch (Exception ex)
         {
-            return new ApiResponse<HeyGenVideoResponse>
-            {
-                IsSuccess = false,
-                ErrorMessage = $"Error calling HeyGen API: {ex.Message}",
-                StatusCode = 500
-            };
+            return new ApiResponse<HeyGenVideoResponse>(
+                IsSuccess: false,
+                Data: null,
+                ErrorMessage: $"Error calling HeyGen API: {ex.Message}",
+                StatusCode: 500
+            );
         }
     }
 
@@ -108,41 +108,41 @@ public class HeyGenService : IHeyGenService
 
             if (!response.IsSuccessStatusCode)
             {
-                return new ApiResponse<HeyGenVideoStatusResponse>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"HeyGen API error: {response.StatusCode} - {responseJson}",
-                    StatusCode = (int)response.StatusCode
-                };
+                return new ApiResponse<HeyGenVideoStatusResponse>(
+                    IsSuccess: false,
+                    Data: null,
+                    ErrorMessage: $"HeyGen API error: {response.StatusCode} - {responseJson}",
+                    StatusCode: (int)response.StatusCode
+                );
             }
 
             var statusResponse = JsonSerializer.Deserialize<HeyGenVideoStatusResponse>(responseJson);
 
             if (statusResponse == null || statusResponse.Code != 100)
             {
-                return new ApiResponse<HeyGenVideoStatusResponse>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"HeyGen API error: {statusResponse?.Message ?? "Unknown error"}",
-                    StatusCode = 500
-                };
+                return new ApiResponse<HeyGenVideoStatusResponse>(
+                    IsSuccess: false,
+                    Data: null,
+                    ErrorMessage: $"HeyGen API error: {statusResponse?.Message ?? "Unknown error"}",
+                    StatusCode: 500
+                );
             }
 
-            return new ApiResponse<HeyGenVideoStatusResponse>
-            {
-                IsSuccess = true,
-                Data = statusResponse,
-                StatusCode = 200
-            };
+            return new ApiResponse<HeyGenVideoStatusResponse>(
+                IsSuccess: true,
+                Data: statusResponse,
+                ErrorMessage: string.Empty,
+                StatusCode: 200
+            );
         }
         catch (Exception ex)
         {
-            return new ApiResponse<HeyGenVideoStatusResponse>
-            {
-                IsSuccess = false,
-                ErrorMessage = $"Error checking video status: {ex.Message}",
-                StatusCode = 500
-            };
+            return new ApiResponse<HeyGenVideoStatusResponse>(
+                IsSuccess: false,
+                Data: null,
+                ErrorMessage: $"Error checking video status: {ex.Message}",
+                StatusCode: 500
+            );
         }
     }
 
@@ -156,62 +156,44 @@ public class HeyGenService : IHeyGenService
 
             if (!response.IsSuccessStatusCode)
             {
-                return new ApiResponse<byte[]>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Failed to download video: {response.StatusCode}",
-                    StatusCode = (int)response.StatusCode
-                };
+                return new ApiResponse<byte[]>(
+                    IsSuccess: false,
+                    Data: null,
+                    ErrorMessage: $"Failed to download video: {response.StatusCode}",
+                    StatusCode: (int)response.StatusCode
+                );
             }
 
             var videoBytes = await response.Content.ReadAsByteArrayAsync();
 
-            return new ApiResponse<byte[]>
-            {
-                IsSuccess = true,
-                Data = videoBytes,
-                StatusCode = 200
-            };
+            return new ApiResponse<byte[]>(
+                IsSuccess: true,
+                Data: videoBytes,
+                ErrorMessage: string.Empty,
+                StatusCode: 200
+            );
         }
         catch (Exception ex)
         {
-            return new ApiResponse<byte[]>
-            {
-                IsSuccess = false,
-                ErrorMessage = $"Error downloading video: {ex.Message}",
-                StatusCode = 500
-            };
+            return new ApiResponse<byte[]>(
+                IsSuccess: false,
+                Data: null,
+                ErrorMessage: $"Error downloading video: {ex.Message}",
+                StatusCode: 500
+            );
         }
     }
 
     private HeyGenVideoRequest CreateVideoRequest(Script script)
     {
-        return new HeyGenVideoRequest
-        {
-            VideoInputs = new List<HeyGenVideoInput>
-            {
-                new HeyGenVideoInput
-                {
-                    Character = new HeyGenCharacter
-                    {
-                        Type = "avatar",
-                        AvatarId = "Abigail_expressive_2024112501",
-                        AvatarStyle = "normal"
-                    },
-                    Voice = new HeyGenVoice
-                    {
-                        Type = "text",
-                        InputText = script.Content,
-                        VoiceId = "73c0b6a2e29d4d38aca41454bf58c955",
-                        Speed = 1.1
-                    }
-                }
-            },
-            Dimension = new HeyGenDimension
-            {
-                Width = 1280,
-                Height = 720
-            }
-        };
+        var character = new HeyGenCharacter();
+        var voice = new HeyGenVoice(InputText: script.Content);
+        var videoInput = new HeyGenVideoInput(Character: character, Voice: voice);
+        var dimension = new HeyGenDimension();
+        
+        return new HeyGenVideoRequest(
+            VideoInputs: new List<HeyGenVideoInput> { videoInput },
+            Dimension: dimension
+        );
     }
 }

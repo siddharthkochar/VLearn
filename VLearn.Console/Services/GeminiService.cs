@@ -32,12 +32,12 @@ public class GeminiService : IGeminiService
         {
             if (string.IsNullOrEmpty(_settings.ApiKey))
             {
-                return new ApiResponse<Script>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "Gemini API key is not configured. Please add your API key to appsettings.json",
-                    StatusCode = 400
-                };
+                return new ApiResponse<Script>(
+                    IsSuccess: false,
+                    Data: null,
+                    ErrorMessage: "Gemini API key is not configured. Please add your API key to appsettings.json",
+                    StatusCode: 400
+                );
             }
 
             var prompt = CreateLearningScriptPrompt(inputText);
@@ -56,12 +56,12 @@ public class GeminiService : IGeminiService
 
             if (!response.IsSuccessStatusCode)
             {
-                return new ApiResponse<Script>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = $"Gemini API error: {response.StatusCode} - {responseJson}",
-                    StatusCode = (int)response.StatusCode
-                };
+                return new ApiResponse<Script>(
+                    IsSuccess: false,
+                    Data: null,
+                    ErrorMessage: $"Gemini API error: {response.StatusCode} - {responseJson}",
+                    StatusCode: (int)response.StatusCode
+                );
             }
 
             var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(responseJson, new JsonSerializerOptions
@@ -71,32 +71,32 @@ public class GeminiService : IGeminiService
 
             if (geminiResponse?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text == null)
             {
-                return new ApiResponse<Script>
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "No content received from Gemini API",
-                    StatusCode = 500
-                };
+                return new ApiResponse<Script>(
+                    IsSuccess: false,
+                    Data: null,
+                    ErrorMessage: "No content received from Gemini API",
+                    StatusCode: 500
+                );
             }
 
             var scriptText = geminiResponse.Candidates.First().Content.Parts.First().Text;
             var script = ParseScriptFromResponse(scriptText, inputText);
 
-            return new ApiResponse<Script>
-            {
-                IsSuccess = true,
-                Data = script,
-                StatusCode = 200
-            };
+            return new ApiResponse<Script>(
+                IsSuccess: true,
+                Data: script,
+                ErrorMessage: string.Empty,
+                StatusCode: 200
+            );
         }
         catch (Exception ex)
         {
-            return new ApiResponse<Script>
-            {
-                IsSuccess = false,
-                ErrorMessage = $"Error calling Gemini API: {ex.Message}",
-                StatusCode = 500
-            };
+            return new ApiResponse<Script>(
+                IsSuccess: false,
+                Data: null,
+                ErrorMessage: $"Error calling Gemini API: {ex.Message}",
+                StatusCode: 500
+            );
         }
     }
 
