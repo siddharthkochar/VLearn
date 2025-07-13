@@ -42,9 +42,8 @@ public record HeyGenDimension(
 /// Represents HeyGen video creation response
 /// </summary>
 public record HeyGenVideoResponse(
-    [property: JsonPropertyName("code")] int Code,
-    [property: JsonPropertyName("data")] HeyGenVideoData Data,
-    [property: JsonPropertyName("message")] string Message
+    [property: JsonPropertyName("error")] string? Error,
+    [property: JsonPropertyName("data")] HeyGenVideoData Data
 );
 
 public record HeyGenVideoData(
@@ -63,13 +62,7 @@ public record HeyGenVideoStatusResponse(
 public record HeyGenVideoStatusData(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("callback_id")] string? CallbackId = null,
-    [property: JsonPropertyName("caption_url")] string? CaptionUrl = null,
-    [property: JsonPropertyName("created_at")] long CreatedAt = 0,
-    [property: JsonPropertyName("duration")] double Duration = 0,
-    [property: JsonPropertyName("error")] string? Error = null,
     [property: JsonPropertyName("gif_url")] string? GifUrl = null,
     [property: JsonPropertyName("thumbnail_url")] string? ThumbnailUrl = null,
-    [property: JsonPropertyName("video_url")] string? VideoUrl = null,
-    [property: JsonPropertyName("video_url_caption")] string? VideoUrlCaption = null
+    [property: JsonPropertyName("video_url")] string? VideoUrl = null
 );

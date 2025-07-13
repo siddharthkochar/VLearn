@@ -50,6 +50,7 @@ public class HeyGenService : IHeyGenService
         var responseJson = await response.Content.ReadAsStringAsync();
 
         WriteLine($"📡 API Response Status: {response.StatusCode}");
+        WriteLine($"📡 API Response Body: {responseJson}");
 
         if (!response.IsSuccessStatusCode)
         {
@@ -63,12 +64,32 @@ public class HeyGenService : IHeyGenService
 
         var videoResponse = JsonSerializer.Deserialize<HeyGenVideoResponse>(responseJson);
 
-        if (videoResponse == null || videoResponse.Code != 100)
+        if (videoResponse == null)
         {
             return new ApiResponse<HeyGenVideoResponse>(
                 IsSuccess: false,
                 Data: null,
-                ErrorMessage: $"HeyGen API returned error: {videoResponse?.Message ?? "Unknown error"}",
+                ErrorMessage: "Failed to deserialize HeyGen API response",
+                StatusCode: 500
+            );
+        }
+
+        if (!string.IsNullOrEmpty(videoResponse.Error))
+        {
+            return new ApiResponse<HeyGenVideoResponse>(
+                IsSuccess: false,
+                Data: null,
+                ErrorMessage: $"HeyGen API returned error: {videoResponse.Error}",
+                StatusCode: 500
+            );
+        }
+
+        if (videoResponse.Data == null || string.IsNullOrEmpty(videoResponse.Data.VideoId))
+        {
+            return new ApiResponse<HeyGenVideoResponse>(
+                IsSuccess: false,
+                Data: null,
+                ErrorMessage: "HeyGen API response missing video_id",
                 StatusCode: 500
             );
         }
