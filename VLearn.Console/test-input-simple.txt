@@ -1,1 +1,0 @@
-Artificial Intelligence is a branch of computer science that aims to create intelligent machines that can think and learn like humans. AI systems can process large amounts of data, recognize patterns, and make decisions based on the information they analyze. Modern AI applications include virtual assistants, image recognition, natural language processing, and autonomous vehicles.
