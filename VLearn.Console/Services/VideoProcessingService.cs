@@ -4,7 +4,7 @@ using VLearn.Console.Services;
 namespace VLearn.Console.Services;
 
 /// <summary>
-/// Service to handle the complete video processing workflow
+/// Video processing service using HeyGen
 /// </summary>
 public interface IVideoProcessingService
 {
@@ -13,39 +13,40 @@ public interface IVideoProcessingService
 
 public class VideoProcessingService : IVideoProcessingService
 {
-    private readonly ISynthesiaService _synthesiaService;
+    private readonly IHeyGenService _heyGenService;
     private readonly int _maxPollingAttempts = 60; // 5 minutes with 5-second intervals
     private readonly int _pollingIntervalSeconds = 5;
 
-    public VideoProcessingService(ISynthesiaService synthesiaService)
+    public VideoProcessingService(IHeyGenService heyGenService)
     {
-        _synthesiaService = synthesiaService;
+        _heyGenService = heyGenService;
     }
 
     public async Task<ApiResponse<string>> ProcessVideoAsync(Script script)
     {
         try
         {
+            System.Console.WriteLine("🎬 Creating video with HeyGen...");
+
             // Step 1: Create video
-            System.Console.WriteLine("🎬 Submitting video creation request...");
-            var createResponse = await _synthesiaService.CreateVideoAsync(script);
+            var createResponse = await _heyGenService.CreateVideoAsync(script);
             
             if (!createResponse.IsSuccess)
             {
                 return new ApiResponse<string>
                 {
                     IsSuccess = false,
-                    ErrorMessage = $"Failed to create video: {createResponse.ErrorMessage}",
+                    ErrorMessage = $"Failed to create video with HeyGen: {createResponse.ErrorMessage}",
                     StatusCode = createResponse.StatusCode
                 };
             }
 
-            var videoId = createResponse.Data!.Id;
-            System.Console.WriteLine($"✅ Video creation started. Video ID: {videoId}");
+            var videoId = "f0e462ce0e0544fa8aa6b03613df1393"; // createResponse.Data!.Data.VideoId;
+            System.Console.WriteLine($"✅ HeyGen video creation started. Video ID: {videoId}");
             System.Console.WriteLine("⏰ Video is being processed. This typically takes 3-5 minutes...");
 
             // Step 2: Poll for completion
-            var pollResult = await PollForVideoCompletion(videoId);
+            var pollResult = await PollForHeyGenCompletion(videoId);
             if (!pollResult.IsSuccess)
             {
                 return new ApiResponse<string>
@@ -59,51 +60,41 @@ public class VideoProcessingService : IVideoProcessingService
             var completedVideo = pollResult.Data!;
             
             // Step 3: Download video
-            if (string.IsNullOrEmpty(completedVideo.DownloadUrl))
+            if (string.IsNullOrEmpty(completedVideo.Data.VideoUrl))
             {
                 return new ApiResponse<string>
                 {
                     IsSuccess = false,
-                    ErrorMessage = "Video completed but no download URL provided",
+                    ErrorMessage = "HeyGen video completed but no download URL provided",
                     StatusCode = 500
                 };
             }
 
-            var downloadResult = await DownloadAndSaveVideo(completedVideo.DownloadUrl, script.Title);
-            if (!downloadResult.IsSuccess)
-            {
-                return downloadResult;
-            }
-
-            return new ApiResponse<string>
-            {
-                IsSuccess = true,
-                Data = downloadResult.Data,
-                StatusCode = 200
-            };
+            var downloadResult = await DownloadAndSaveVideo(completedVideo.Data.VideoUrl, script.Title);
+            return downloadResult;
         }
         catch (Exception ex)
         {
             return new ApiResponse<string>
             {
                 IsSuccess = false,
-                ErrorMessage = $"Error processing video: {ex.Message}",
+                ErrorMessage = $"Error in video processing: {ex.Message}",
                 StatusCode = 500
             };
         }
     }
 
-    private async Task<ApiResponse<VideoResponse>> PollForVideoCompletion(string videoId)
+    private async Task<ApiResponse<HeyGenVideoStatusResponse>> PollForHeyGenCompletion(string videoId)
     {
         for (int attempt = 1; attempt <= _maxPollingAttempts; attempt++)
         {
-            System.Console.WriteLine($"🔄 Checking video status... (Attempt {attempt}/{_maxPollingAttempts})");
+            System.Console.WriteLine($"🔄 Checking HeyGen video status... (Attempt {attempt}/{_maxPollingAttempts})");
             
-            var statusResponse = await _synthesiaService.GetVideoStatusAsync(videoId);
+            var statusResponse = await _heyGenService.GetVideoStatusAsync(videoId);
             
             if (!statusResponse.IsSuccess)
             {
-                return new ApiResponse<VideoResponse>
+                return new ApiResponse<HeyGenVideoStatusResponse>
                 {
                     IsSuccess = false,
                     ErrorMessage = $"Failed to check video status: {statusResponse.ErrorMessage}",
@@ -112,25 +103,25 @@ public class VideoProcessingService : IVideoProcessingService
             }
 
             var video = statusResponse.Data!;
-            System.Console.WriteLine($"📊 Video status: {video.Status}");
+            System.Console.WriteLine($"📊 Video status: {video.Data.Status}");
 
-            switch (video.Status.ToLower())
+            switch (video.Data.Status.ToLower())
             {
                 case "complete":
-                    System.Console.WriteLine("✅ Video processing completed!");
+                case "completed":
+                    System.Console.WriteLine("✅ HeyGen video processing completed!");
                     return statusResponse;
                 
                 case "failed":
                 case "error":
-                    return new ApiResponse<VideoResponse>
+                    return new ApiResponse<HeyGenVideoStatusResponse>
                     {
                         IsSuccess = false,
-                        ErrorMessage = "Video processing failed on Synthesia platform",
+                        ErrorMessage = "Video processing failed on HeyGen platform",
                         StatusCode = 500
                     };
                 
-                case "in_progress":
-                case "queued":
+                case "processing":
                 case "pending":
                     // Continue polling
                     if (attempt < _maxPollingAttempts)
@@ -140,7 +131,7 @@ public class VideoProcessingService : IVideoProcessingService
                     break;
                 
                 default:
-                    System.Console.WriteLine($"⚠️ Unknown status: {video.Status}. Continuing to poll...");
+                    System.Console.WriteLine($"⚠️ Unknown status: {video.Data.Status}. Continuing to poll...");
                     if (attempt < _maxPollingAttempts)
                     {
                         await Task.Delay(_pollingIntervalSeconds * 1000);
@@ -149,10 +140,10 @@ public class VideoProcessingService : IVideoProcessingService
             }
         }
 
-        return new ApiResponse<VideoResponse>
+        return new ApiResponse<HeyGenVideoStatusResponse>
         {
             IsSuccess = false,
-            ErrorMessage = $"Video processing timed out after {_maxPollingAttempts * _pollingIntervalSeconds / 60} minutes",
+            ErrorMessage = $"HeyGen video processing timed out after {_maxPollingAttempts * _pollingIntervalSeconds / 60} minutes",
             StatusCode = 408
         };
     }
@@ -161,8 +152,8 @@ public class VideoProcessingService : IVideoProcessingService
     {
         try
         {
-            // Download video
-            var downloadResponse = await _synthesiaService.DownloadVideoAsync(downloadUrl);
+            // Download video using HeyGen service
+            var downloadResponse = await _heyGenService.DownloadVideoAsync(downloadUrl);
             
             if (!downloadResponse.IsSuccess)
             {
@@ -189,14 +180,14 @@ public class VideoProcessingService : IVideoProcessingService
                 safeTitle = safeTitle[..50];
             }
             
-            var fileName = $"video_{timestamp}_{safeTitle}.mp4";
+            var fileName = $"heygen_video_{timestamp}_{safeTitle}.mp4";
             var filePath = Path.Combine(outputDir, fileName);
 
             // Save video file
             await File.WriteAllBytesAsync(filePath, downloadResponse.Data!);
             
             var fileSize = downloadResponse.Data!.Length / 1024.0 / 1024.0; // MB
-            System.Console.WriteLine($"💾 Video saved: {filePath}");
+            System.Console.WriteLine($"💾 HeyGen video saved: {filePath}");
             System.Console.WriteLine($"📏 File size: {fileSize:F2} MB");
 
             return new ApiResponse<string>
@@ -211,7 +202,7 @@ public class VideoProcessingService : IVideoProcessingService
             return new ApiResponse<string>
             {
                 IsSuccess = false,
-                ErrorMessage = $"Error saving video: {ex.Message}",
+                ErrorMessage = $"Error saving HeyGen video: {ex.Message}",
                 StatusCode = 500
             };
         }

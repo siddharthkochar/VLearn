@@ -105,7 +105,7 @@ public class GeminiService : IGeminiService
         return $@"You are an expert educational content creator. Convert the following text into a clear, engaging video script for learning purposes.
 
 REQUIREMENTS:
-- Create a script suitable for a 2-4 minute educational video
+- Create a script suitable for a 2 second educational video
 - Use conversational, clear language appropriate for video narration
 - Structure the content with a brief introduction, main points, and conclusion
 - Make it engaging and easy to follow when spoken aloud

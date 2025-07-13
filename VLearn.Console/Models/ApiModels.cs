@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace VLearn.Console.Models;
 
 /// <summary>
@@ -12,75 +14,141 @@ public class ApiResponse<T>
 }
 
 /// <summary>
-/// Represents Synthesia video creation response
+/// Represents HeyGen video creation request
 /// </summary>
-public class VideoResponse
+public class HeyGenVideoRequest
 {
+    [JsonPropertyName("video_inputs")]
+    public List<HeyGenVideoInput> VideoInputs { get; set; } = new();
+    
+    [JsonPropertyName("dimension")]
+    public HeyGenDimension? Dimension { get; set; }
+}
+
+public class HeyGenVideoInput
+{
+    [JsonPropertyName("character")]
+    public HeyGenCharacter Character { get; set; } = new();
+    
+    [JsonPropertyName("voice")]
+    public HeyGenVoice Voice { get; set; } = new();
+}
+
+public class HeyGenCharacter
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "avatar";
+    
+    [JsonPropertyName("avatar_id")]
+    public string AvatarId { get; set; } = "Abigail_expressive_2024112501";
+    
+    [JsonPropertyName("avatar_style")]
+    public string AvatarStyle { get; set; } = "normal";
+}
+
+public class HeyGenVoice
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "text";
+    
+    [JsonPropertyName("input_text")]
+    public string InputText { get; set; } = string.Empty;
+    
+    [JsonPropertyName("voice_id")]
+    public string VoiceId { get; set; } = "73c0b6a2e29d4d38aca41454bf58c955";
+    
+    [JsonPropertyName("speed")]
+    public double Speed { get; set; } = 1.1;
+}
+
+public class HeyGenBackground
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "color";
+    
+    [JsonPropertyName("value")]
+    public string Value { get; set; } = "#008000";
+}
+
+public class HeyGenDimension
+{
+    [JsonPropertyName("width")]
+    public int Width { get; set; } = 1280;
+    
+    [JsonPropertyName("height")]
+    public int Height { get; set; } = 720;
+}
+
+/// <summary>
+/// Represents HeyGen video creation response
+/// </summary>
+public class HeyGenVideoResponse
+{
+    [JsonPropertyName("code")]
+    public int Code { get; set; }
+    
+    [JsonPropertyName("data")]
+    public HeyGenVideoData Data { get; set; } = new();
+    
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = string.Empty;
+}
+
+public class HeyGenVideoData
+{
+    [JsonPropertyName("video_id")]
+    public string VideoId { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Represents HeyGen video status response
+/// </summary>
+public class HeyGenVideoStatusResponse
+{
+    [JsonPropertyName("code")]
+    public int Code { get; set; }
+    
+    [JsonPropertyName("data")]
+    public HeyGenVideoStatusData Data { get; set; } = new();
+    
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = string.Empty;
+}
+
+public class HeyGenVideoStatusData
+{
+    [JsonPropertyName("callback_id")]
+    public string? CallbackId { get; set; }
+    
+    [JsonPropertyName("caption_url")]
+    public string? CaptionUrl { get; set; }
+    
+    [JsonPropertyName("created_at")]
+    public long CreatedAt { get; set; }
+    
+    [JsonPropertyName("duration")]
+    public double Duration { get; set; }
+    
+    [JsonPropertyName("error")]
+    public string? Error { get; set; }
+    
+    [JsonPropertyName("gif_url")]
+    public string? GifUrl { get; set; }
+    
+    [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
+    
+    [JsonPropertyName("status")]
     public string Status { get; set; } = string.Empty;
-    public string? DownloadUrl { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string? Title { get; set; }
-    public int? Duration { get; set; }
-}
-
-/// <summary>
-/// Represents Synthesia video creation request
-/// </summary>
-public class SynthesiaVideoRequest
-{
-    public bool Test { get; set; } = true;
-    public string Title { get; set; } = string.Empty;
-    public List<SynthesiaInput> Input { get; set; } = new();
-}
-
-public class SynthesiaInput
-{
-    public SynthesiaAvatar Avatar { get; set; } = new();
-    public SynthesiaBackground Background { get; set; } = new();
-    public string ScriptText { get; set; } = string.Empty;
-}
-
-public class SynthesiaAvatar
-{
-    public string Avatar { get; set; } = "anna_costume1_cameraA";
-}
-
-public class SynthesiaBackground
-{
-    public string Background { get; set; } = "green_screen";
-}
-
-/// <summary>
-/// Represents DeepBrainAI video creation request
-/// </summary>
-public class DeepBrainVideoRequest
-{
-    public string Language { get; set; } = "en";
-    public string Text { get; set; } = string.Empty;
-    public string Model { get; set; } = "ysy";
-    public string Clothes { get; set; } = "1";
-    public string? Webhook { get; set; }
-}
-
-/// <summary>
-/// Represents DeepBrainAI video creation response
-/// </summary>
-public class DeepBrainVideoResponse
-{
-    public bool Success { get; set; }
-    public string Key { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents DeepBrainAI project status response
-/// </summary>
-public class DeepBrainProjectResponse
-{
-    public string Status { get; set; } = string.Empty;
-    public string? DownloadUrl { get; set; }
-    public string? Title { get; set; }
-    public DateTime? CreatedAt { get; set; }
+    
+    [JsonPropertyName("thumbnail_url")]
+    public string? ThumbnailUrl { get; set; }
+    
+    [JsonPropertyName("video_url")]
+    public string? VideoUrl { get; set; }
+    
+    [JsonPropertyName("video_url_caption")]
+    public string? VideoUrlCaption { get; set; }
 }
 
 /// <summary>

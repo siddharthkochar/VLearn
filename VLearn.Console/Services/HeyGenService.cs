@@ -7,50 +7,48 @@ using System.Text;
 namespace VLearn.Console.Services;
 
 /// <summary>
-/// Service to interact with Synthesia API for video generation
+/// Service to interact with HeyGen API for video generation
 /// </summary>
-public interface ISynthesiaService
+public interface IHeyGenService
 {
-    Task<ApiResponse<VideoResponse>> CreateVideoAsync(Script script);
-    Task<ApiResponse<VideoResponse>> GetVideoStatusAsync(string videoId);
+    Task<ApiResponse<HeyGenVideoResponse>> CreateVideoAsync(Script script);
+    Task<ApiResponse<HeyGenVideoStatusResponse>> GetVideoStatusAsync(string videoId);
     Task<ApiResponse<byte[]>> DownloadVideoAsync(string downloadUrl);
 }
 
-public class SynthesiaService : ISynthesiaService
+public class HeyGenService : IHeyGenService
 {
     private readonly HttpClient _httpClient;
-    private readonly SynthesiaApiSettings _settings;
+    private readonly HeyGenApiSettings _settings;
 
-    public SynthesiaService(HttpClient httpClient, IOptions<AppSettings> options)
+    public HeyGenService(HttpClient httpClient, IOptions<AppSettings> options)
     {
         _httpClient = httpClient;
-        _settings = options.Value.SynthesiaApi;
+        _settings = options.Value.HeyGenApi;
     }
 
-    public async Task<ApiResponse<VideoResponse>> CreateVideoAsync(Script script)
+    public async Task<ApiResponse<HeyGenVideoResponse>> CreateVideoAsync(Script script)
     {
         try
         {
             if (string.IsNullOrEmpty(_settings.ApiKey))
             {
-                return new ApiResponse<VideoResponse>
+                return new ApiResponse<HeyGenVideoResponse>
                 {
                     IsSuccess = false,
-                    ErrorMessage = "Synthesia API key is not configured. Please add your API key to appsettings.json",
+                    ErrorMessage = "HeyGen API key is not configured. Please add your API key to appsettings.json",
                     StatusCode = 400
                 };
             }
 
             var videoRequest = CreateVideoRequest(script);
-            var json = JsonSerializer.Serialize(videoRequest, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+            var json = JsonSerializer.Serialize(videoRequest);
 
-            System.Console.WriteLine("🎬 Creating video with Synthesia...");
+            System.Console.WriteLine("🎬 Creating video with HeyGen...");
+            System.Console.WriteLine($"🔍 Request JSON: {json}");
             
-            var request = new HttpRequestMessage(HttpMethod.Post, $"{_settings.BaseUrl}/videos");
-            request.Headers.Add("Authorization", $"Bearer {_settings.ApiKey}");
+            var request = new HttpRequestMessage(HttpMethod.Post, $"{_settings.BaseUrl}/v2/video/generate");
+            request.Headers.Add("X-Api-Key", _settings.ApiKey);
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.SendAsync(request);
@@ -60,30 +58,27 @@ public class SynthesiaService : ISynthesiaService
 
             if (!response.IsSuccessStatusCode)
             {
-                return new ApiResponse<VideoResponse>
+                return new ApiResponse<HeyGenVideoResponse>
                 {
                     IsSuccess = false,
-                    ErrorMessage = $"Synthesia API error: {response.StatusCode} - {responseJson}",
+                    ErrorMessage = $"HeyGen API error: {response.StatusCode} - {responseJson}",
                     StatusCode = (int)response.StatusCode
                 };
             }
 
-            var videoResponse = JsonSerializer.Deserialize<VideoResponse>(responseJson, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var videoResponse = JsonSerializer.Deserialize<HeyGenVideoResponse>(responseJson);
 
-            if (videoResponse == null)
+            if (videoResponse == null || videoResponse.Code != 100)
             {
-                return new ApiResponse<VideoResponse>
+                return new ApiResponse<HeyGenVideoResponse>
                 {
                     IsSuccess = false,
-                    ErrorMessage = "No response received from Synthesia API",
+                    ErrorMessage = $"HeyGen API returned error: {videoResponse?.Message ?? "Unknown error"}",
                     StatusCode = 500
                 };
             }
 
-            return new ApiResponse<VideoResponse>
+            return new ApiResponse<HeyGenVideoResponse>
             {
                 IsSuccess = true,
                 Data = videoResponse,
@@ -92,60 +87,57 @@ public class SynthesiaService : ISynthesiaService
         }
         catch (Exception ex)
         {
-            return new ApiResponse<VideoResponse>
+            return new ApiResponse<HeyGenVideoResponse>
             {
                 IsSuccess = false,
-                ErrorMessage = $"Error calling Synthesia API: {ex.Message}",
+                ErrorMessage = $"Error calling HeyGen API: {ex.Message}",
                 StatusCode = 500
             };
         }
     }
 
-    public async Task<ApiResponse<VideoResponse>> GetVideoStatusAsync(string videoId)
+    public async Task<ApiResponse<HeyGenVideoStatusResponse>> GetVideoStatusAsync(string videoId)
     {
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{_settings.BaseUrl}/videos/{videoId}");
-            request.Headers.Add("Authorization", $"Bearer {_settings.ApiKey}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_settings.BaseUrl}/v1/video_status.get?video_id={videoId}");
+            request.Headers.Add("X-Api-Key", _settings.ApiKey);
 
             var response = await _httpClient.SendAsync(request);
             var responseJson = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                return new ApiResponse<VideoResponse>
+                return new ApiResponse<HeyGenVideoStatusResponse>
                 {
                     IsSuccess = false,
-                    ErrorMessage = $"Synthesia API error: {response.StatusCode} - {responseJson}",
+                    ErrorMessage = $"HeyGen API error: {response.StatusCode} - {responseJson}",
                     StatusCode = (int)response.StatusCode
                 };
             }
 
-            var videoResponse = JsonSerializer.Deserialize<VideoResponse>(responseJson, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var statusResponse = JsonSerializer.Deserialize<HeyGenVideoStatusResponse>(responseJson);
 
-            if (videoResponse == null)
+            if (statusResponse == null || statusResponse.Code != 100)
             {
-                return new ApiResponse<VideoResponse>
+                return new ApiResponse<HeyGenVideoStatusResponse>
                 {
                     IsSuccess = false,
-                    ErrorMessage = "No response received from Synthesia API",
+                    ErrorMessage = $"HeyGen API error: {statusResponse?.Message ?? "Unknown error"}",
                     StatusCode = 500
                 };
             }
 
-            return new ApiResponse<VideoResponse>
+            return new ApiResponse<HeyGenVideoStatusResponse>
             {
                 IsSuccess = true,
-                Data = videoResponse,
+                Data = statusResponse,
                 StatusCode = 200
             };
         }
         catch (Exception ex)
         {
-            return new ApiResponse<VideoResponse>
+            return new ApiResponse<HeyGenVideoStatusResponse>
             {
                 IsSuccess = false,
                 ErrorMessage = $"Error checking video status: {ex.Message}",
@@ -158,7 +150,7 @@ public class SynthesiaService : ISynthesiaService
     {
         try
         {
-            System.Console.WriteLine("💾 Downloading video...");
+            System.Console.WriteLine("💾 Downloading HeyGen video...");
             
             var response = await _httpClient.GetAsync(downloadUrl);
 
@@ -192,26 +184,33 @@ public class SynthesiaService : ISynthesiaService
         }
     }
 
-    private SynthesiaVideoRequest CreateVideoRequest(Script script)
+    private HeyGenVideoRequest CreateVideoRequest(Script script)
     {
-        return new SynthesiaVideoRequest
+        return new HeyGenVideoRequest
         {
-            Test = true, // Keep as test mode for now
-            Title = script.Title,
-            Input = new List<SynthesiaInput>
+            VideoInputs = new List<HeyGenVideoInput>
             {
-                new SynthesiaInput
+                new HeyGenVideoInput
                 {
-                    Avatar = new SynthesiaAvatar
+                    Character = new HeyGenCharacter
                     {
-                        Avatar = "anna_costume1_cameraA" // Default avatar as specified
+                        Type = "avatar",
+                        AvatarId = "Abigail_expressive_2024112501",
+                        AvatarStyle = "normal"
                     },
-                    Background = new SynthesiaBackground
+                    Voice = new HeyGenVoice
                     {
-                        Background = "green_screen" // Default background as specified
-                    },
-                    ScriptText = script.Content
+                        Type = "text",
+                        InputText = script.Content,
+                        VoiceId = "73c0b6a2e29d4d38aca41454bf58c955",
+                        Speed = 1.1
+                    }
                 }
+            },
+            Dimension = new HeyGenDimension
+            {
+                Width = 1280,
+                Height = 720
             }
         };
     }
