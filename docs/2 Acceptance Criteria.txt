@@ -1,4 +1,4 @@
-🎬 VLearn V2 - ACCEPTANCE CRITERIA
+🎬 VLearn - ACCEPTANCE CRITERIA
 ==============================
 ✅ Application accepts text input via file or console
 ✅ Successfully generates educational scripts using Gemini API

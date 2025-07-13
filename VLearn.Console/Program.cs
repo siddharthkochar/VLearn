@@ -4,7 +4,7 @@ using VLearn.Console;
 using VLearn.Console.Configuration;
 using VLearn.Console.Services;
 
-WriteLine("🎬 VLearn V2 - AI Video Learning Console App");
+WriteLine("🎬 VLearn - AI Video Learning Console App");
 WriteLine("=".PadRight(50, '='));
 
 // Parse command line arguments

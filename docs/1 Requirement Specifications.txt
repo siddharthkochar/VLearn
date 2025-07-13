@@ -1,4 +1,4 @@
-🎬 VLearn V2 - Detailed Requirements
+🎬 VLearn - Detailed Requirements
 =====================================
 
 CORE REQUIREMENTS

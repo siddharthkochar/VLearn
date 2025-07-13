@@ -1,4 +1,4 @@
-🎬 VLearn V2 - Why Copilot suggestion is agreed or accepted
+🎬 VLearn - Why Copilot suggestion is agreed or accepted
 ===============================================================
 
 Instead of providing details and directly asking to implement the requirement, I've spend significant time with Claude Sonnet 4 to plan this project. This planning mode which includes following things:

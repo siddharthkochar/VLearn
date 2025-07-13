@@ -1,4 +1,4 @@
-🎬 VLearn V2 - Solution Approach with technical information
+🎬 VLearn - Solution Approach with technical information
 ==============================
 
 Please check: PROJECT_PLAN.md
