@@ -37,14 +37,14 @@ public class InputService : IInputService
         else
         {
             // Read from console
-            System.Console.WriteLine("Enter your text content (press Enter twice to finish):");
-            System.Console.WriteLine("=".PadRight(50, '='));
+            WriteLine("Enter your text content (press Enter twice to finish):");
+            WriteLine("=".PadRight(50, '='));
             
             var lines = new List<string>();
             string? line;
             int emptyLineCount = 0;
 
-            while ((line = System.Console.ReadLine()) != null)
+            while ((line = ReadLine()) != null)
             {
                 if (string.IsNullOrEmpty(line))
                 {

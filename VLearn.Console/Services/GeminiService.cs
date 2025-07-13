@@ -28,76 +28,64 @@ public class GeminiService : IGeminiService
 
     public async Task<ApiResponse<Script>> GenerateScriptAsync(string inputText)
     {
-        try
-        {
-            if (string.IsNullOrEmpty(_settings.ApiKey))
-            {
-                return new ApiResponse<Script>(
-                    IsSuccess: false,
-                    Data: null,
-                    ErrorMessage: "Gemini API key is not configured. Please add your API key to appsettings.json",
-                    StatusCode: 400
-                );
-            }
-
-            var prompt = CreateLearningScriptPrompt(inputText);
-            var requestBody = CreateGeminiRequest(prompt);
-            var json = JsonSerializer.Serialize(requestBody);
-            
-            var url = $"{_settings.BaseUrl}/models/{_model}:generateContent?key={_settings.ApiKey}";
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            System.Console.WriteLine("🔗 Calling Gemini API...");
-            var response = await _httpClient.PostAsync(url, content);
-            var responseJson = await response.Content.ReadAsStringAsync();
-
-            System.Console.WriteLine($"📡 API Response Status: {response.StatusCode}");
-            System.Console.WriteLine($"📄 Response Length: {responseJson.Length} characters");
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return new ApiResponse<Script>(
-                    IsSuccess: false,
-                    Data: null,
-                    ErrorMessage: $"Gemini API error: {response.StatusCode} - {responseJson}",
-                    StatusCode: (int)response.StatusCode
-                );
-            }
-
-            var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(responseJson, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-
-            if (geminiResponse?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text == null)
-            {
-                return new ApiResponse<Script>(
-                    IsSuccess: false,
-                    Data: null,
-                    ErrorMessage: "No content received from Gemini API",
-                    StatusCode: 500
-                );
-            }
-
-            var scriptText = geminiResponse.Candidates.First().Content.Parts.First().Text;
-            var script = ParseScriptFromResponse(scriptText, inputText);
-
-            return new ApiResponse<Script>(
-                IsSuccess: true,
-                Data: script,
-                ErrorMessage: string.Empty,
-                StatusCode: 200
-            );
-        }
-        catch (Exception ex)
+        if (string.IsNullOrEmpty(_settings.ApiKey))
         {
             return new ApiResponse<Script>(
                 IsSuccess: false,
                 Data: null,
-                ErrorMessage: $"Error calling Gemini API: {ex.Message}",
+                ErrorMessage: "Gemini API key is not configured. Please add your API key to appsettings.json",
+                StatusCode: 400
+            );
+        }
+
+        var prompt = CreateLearningScriptPrompt(inputText);
+        var requestBody = CreateGeminiRequest(prompt);
+        var json = JsonSerializer.Serialize(requestBody);
+            
+        var url = $"{_settings.BaseUrl}/models/{_model}:generateContent?key={_settings.ApiKey}";
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        WriteLine("🔗 Calling Gemini API...");
+        var response = await _httpClient.PostAsync(url, content);
+        var responseJson = await response.Content.ReadAsStringAsync();
+
+        WriteLine($"📡 API Response Status: {response.StatusCode}");
+        WriteLine($"📄 Response Length: {responseJson.Length} characters");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new ApiResponse<Script>(
+                IsSuccess: false,
+                Data: null,
+                ErrorMessage: $"Gemini API error: {response.StatusCode} - {responseJson}",
+                StatusCode: (int)response.StatusCode
+            );
+        }
+
+        var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(responseJson, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (geminiResponse?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text == null)
+        {
+            return new ApiResponse<Script>(
+                IsSuccess: false,
+                Data: null,
+                ErrorMessage: "No content received from Gemini API",
                 StatusCode: 500
             );
         }
+
+        var scriptText = geminiResponse.Candidates.First().Content.Parts.First().Text;
+        var script = ParseScriptFromResponse(scriptText, inputText);
+
+        return new ApiResponse<Script>(
+            IsSuccess: true,
+            Data: script,
+            ErrorMessage: string.Empty,
+            StatusCode: 200
+        );
     }
 
     private string CreateLearningScriptPrompt(string inputText)
