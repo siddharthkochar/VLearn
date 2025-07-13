@@ -2,9 +2,6 @@ using VLearn.Console.Models;
 
 namespace VLearn.Console.Services;
 
-/// <summary>
-/// Service to handle input processing from console or file
-/// </summary>
 public interface IInputService
 {
     Task<InputText> GetInputAsync(string? filePath = null);
@@ -36,7 +33,6 @@ public class InputService : IInputService
         }
         else
         {
-            // Read from console
             WriteLine("Enter your text content (press Enter twice to finish):");
             WriteLine("=".PadRight(50, '='));
             
@@ -50,7 +46,9 @@ public class InputService : IInputService
                 {
                     emptyLineCount++;
                     if (emptyLineCount >= 2)
+                    {
                         break;
+                    }
                 }
                 else
                 {

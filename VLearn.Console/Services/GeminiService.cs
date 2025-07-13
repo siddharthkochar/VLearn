@@ -6,9 +6,6 @@ using System.Text;
 
 namespace VLearn.Console.Services;
 
-/// <summary>
-/// Service to interact with Google Gemini API for script generation
-/// </summary>
 public interface IGeminiService
 {
     Task<ApiResponse<Script>> GenerateScriptAsync(string inputText);
@@ -78,7 +75,7 @@ public class GeminiService : IGeminiService
         }
 
         var scriptText = geminiResponse.Candidates.First().Content.Parts.First().Text;
-        var script = ParseScriptFromResponse(scriptText, inputText);
+        var script = ParseScriptFromResponse(scriptText);
 
         return new ApiResponse<Script>(
             IsSuccess: true,
@@ -88,7 +85,7 @@ public class GeminiService : IGeminiService
         );
     }
 
-    private string CreateLearningScriptPrompt(string inputText)
+    private static string CreateLearningScriptPrompt(string inputText)
     {
         return $@"You are an expert educational content creator. Convert the following text into a clear, engaging video script for learning purposes.
 
@@ -113,7 +110,7 @@ OUTPUT INSTRUCTIONS:
 SCRIPT:";
     }
 
-    private object CreateGeminiRequest(string prompt)
+    private static object CreateGeminiRequest(string prompt)
     {
         return new
         {
@@ -137,7 +134,7 @@ SCRIPT:";
         };
     }
 
-    private Script ParseScriptFromResponse(string scriptText, string originalText)
+    private static Script ParseScriptFromResponse(string scriptText)
     {
         // Clean up the script text
         var cleanScript = scriptText.Trim();

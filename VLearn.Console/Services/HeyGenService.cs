@@ -145,7 +145,7 @@ public class HeyGenService : IHeyGenService
         );
     }
 
-    private HeyGenVideoRequest CreateVideoRequest(Script script)
+    private static HeyGenVideoRequest CreateVideoRequest(Script script)
     {
         var character = new HeyGenCharacter();
         var voice = new HeyGenVoice(InputText: script.Content);

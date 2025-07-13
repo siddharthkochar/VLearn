@@ -133,7 +133,6 @@ public class VideoProcessingService : IVideoProcessingService
 
     private async Task<ApiResponse<string>> DownloadAndSaveVideo(string downloadUrl, string title)
     {
-        // Download video using HeyGen service
         var downloadResponse = await _heyGenService.DownloadVideoAsync(downloadUrl);
             
         if (!downloadResponse.IsSuccess)
@@ -146,14 +145,12 @@ public class VideoProcessingService : IVideoProcessingService
             );
         }
 
-        // Create output directory
         var outputDir = Path.Combine(Directory.GetCurrentDirectory(), "output");
         if (!Directory.Exists(outputDir))
         {
             Directory.CreateDirectory(outputDir);
         }
 
-        // Generate filename
         var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         var safeTitle = string.Join("_", title.Split(Path.GetInvalidFileNameChars()));
         if (safeTitle.Length > 50)
@@ -164,7 +161,6 @@ public class VideoProcessingService : IVideoProcessingService
         var fileName = $"heygen_video_{timestamp}_{safeTitle}.mp4";
         var filePath = Path.Combine(outputDir, fileName);
 
-        // Save video file
         await File.WriteAllBytesAsync(filePath, downloadResponse.Data!);
             
         var fileSize = downloadResponse.Data!.Length / 1024.0 / 1024.0; // MB
