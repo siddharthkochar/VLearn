@@ -128,6 +128,9 @@ public class VLearnApplication
             System.Console.WriteLine($"🎉 Video ready: {videoResult.Data}");
             System.Console.WriteLine();
             
+            // Ask user if they want to view the video
+            await PromptToViewVideo(videoResult.Data!);
+            
             // Show script preview for reference
             System.Console.WriteLine("📋 Generated Script Preview:");
             System.Console.WriteLine("=".PadRight(50, '='));
@@ -141,5 +144,123 @@ public class VLearnApplication
             System.Console.WriteLine($"❌ Error processing input: {ex.Message}");
             throw;
         }
+    }
+
+    private async Task PromptToViewVideo(string videoFilePath)
+    {
+        System.Console.WriteLine();
+        System.Console.Write("🎬 Would you like to view the generated video? (y/N): ");
+        
+        var response = System.Console.ReadLine()?.Trim().ToLower();
+        
+        if (response == "y" || response == "yes")
+        {
+            try
+            {
+                System.Console.WriteLine("🚀 Opening video...");
+                await PlayVideo(videoFilePath);
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine($"❌ Error opening video: {ex.Message}");
+                System.Console.WriteLine($"📁 You can manually open the video at: {videoFilePath}");
+            }
+        }
+        else
+        {
+            System.Console.WriteLine($"📁 Video saved at: {videoFilePath}");
+        }
+    }
+
+    private async Task PlayVideo(string videoFilePath)
+    {
+        try
+        {
+            if (!File.Exists(videoFilePath))
+            {
+                throw new FileNotFoundException($"Video file not found: {videoFilePath}");
+            }
+
+            System.Diagnostics.ProcessStartInfo startInfo;
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                // Windows - use default video player
+                startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = videoFilePath,
+                    UseShellExecute = true
+                };
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                // Linux/macOS - try common video players
+                var players = new[] { "vlc", "mpv", "mplayer", "open" }; // open is for macOS
+                
+                string? availablePlayer = null;
+                foreach (var player in players)
+                {
+                    try
+                    {
+                        var which = await RunCommand("which", player);
+                        if (!string.IsNullOrEmpty(which))
+                        {
+                            availablePlayer = player;
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        // Player not found, continue to next
+                    }
+                }
+
+                if (availablePlayer == null)
+                {
+                    throw new InvalidOperationException("No suitable video player found. Please install VLC, MPV, or MPlayer.");
+                }
+
+                startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = availablePlayer,
+                    Arguments = $"\"{videoFilePath}\"",
+                    UseShellExecute = false
+                };
+            }
+            else
+            {
+                throw new PlatformNotSupportedException("Unsupported operating system");
+            }
+
+            using var process = System.Diagnostics.Process.Start(startInfo);
+            System.Console.WriteLine("✅ Video player launched successfully!");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to open video player: {ex.Message}", ex);
+        }
+    }
+
+    private async Task<string> RunCommand(string command, string arguments)
+    {
+        var startInfo = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = command,
+            Arguments = arguments,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            CreateNoWindow = true
+        };
+
+        using var process = System.Diagnostics.Process.Start(startInfo);
+        if (process == null)
+        {
+            return string.Empty;
+        }
+
+        var output = await process.StandardOutput.ReadToEndAsync();
+        await process.WaitForExitAsync();
+        
+        return process.ExitCode == 0 ? output.Trim() : string.Empty;
     }
 }

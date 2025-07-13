@@ -41,7 +41,7 @@ public class VideoProcessingService : IVideoProcessingService
                 );
             }
 
-            var videoId = "f0e462ce0e0544fa8aa6b03613df1393"; // createResponse.Data!.Data.VideoId;
+            var videoId = createResponse.Data!.Data.VideoId;
             System.Console.WriteLine($"✅ HeyGen video creation started. Video ID: {videoId}");
             System.Console.WriteLine("⏰ Video is being processed. This typically takes 3-5 minutes...");
 
