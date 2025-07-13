@@ -1,4 +1,5 @@
 ﻿using VLearn.Console.Services;
+using VLearn.Console.Extensions;
 
 namespace VLearn.Console;
 
@@ -26,9 +27,12 @@ public class VLearnApplication
         WriteLine($"📝 Content length: {input.Content.Length} characters");
         WriteLine();
 
-        // Step 2: Generate script with Gemini
+        // Step 2: Get script generation preferences
+        var scriptRequest = _inputService.GetScriptGenerationRequest(input.Content);
+
+        // Step 3: Generate script with Gemini
         WriteLine("🧠 Generating script with Gemini...");
-        var scriptResponse = await _geminiService.GenerateScriptAsync(input.Content);
+        var scriptResponse = await _geminiService.GenerateScriptAsync(scriptRequest);
             
         if (!scriptResponse.IsSuccess)
         {
@@ -38,12 +42,13 @@ public class VLearnApplication
 
         var script = scriptResponse.Data!;
         WriteLine($"✅ Script generated successfully!");
+        WriteLine($"📝 Script type: {script.Type.GetDisplayName()}");
         WriteLine($"📝 Script title: {script.Title}");
-        WriteLine($"📝 Script: {script.Content}");
-        WriteLine($"⏱️ Estimated duration: {script.EstimatedDurationSeconds} seconds");
+        WriteLine($"📝 Requested duration: {script.RequestedDurationSeconds} seconds ({script.RequestedDurationMinutes:F1} minutes)");
+        WriteLine($"⏱️ Estimated actual duration: {script.EstimatedDurationSeconds} seconds ({script.EstimatedDurationMinutes:F1} minutes)");
         WriteLine();
 
-        // Step 3: Create video with HeyGen
+        // Step 4: Create video with HeyGen
         WriteLine("🎥 Creating video with HeyGen...");
         var videoResult = await _videoProcessingService.ProcessVideoAsync(script);
             
